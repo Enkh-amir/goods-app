@@ -3,7 +3,7 @@ import LogoEdit from "../logoDeleteEdit/LogoEdit";
 
 const ProductCard = () => {
   return (
-    <div className="w-full flex justify-center">
+    <div className="flex">
       <div className="bg-slate-50 flex border rounded-2xl">
         <div className="w-[364px] h-[140px] flex flex-col gap-3 p-6">
           <p>dfghjk</p>
