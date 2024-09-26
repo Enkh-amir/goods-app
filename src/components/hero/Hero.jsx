@@ -4,9 +4,10 @@ import ProductCard from "../product-card/ProductCard";
 const Hero = () => {
   return (
     <div className="flex mt-[100px]">
-      <Sort />
+      <div className="flex">
+        <ProductCard />
+      </div>
       <button className="btn bg-green-400">Plus</button>
-      <ProductCard />
     </div>
   );
 };
