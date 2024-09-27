@@ -1,10 +1,23 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import ProductCard from "../product-card/ProductCard";
 
 const Hero = () => {
   const BACKEND_ENDPOINT = "http://localhost:8000";
+  const [products, setProducts] = useState([]);
 
+  useEffect(() => {
+    const fetchProducts = async () => {
+      const response = await fetch(BACKEND_ENDPOINT);
+      const data = await response.json();
+
+      const users = data.map((item) => item.user);
+      setProducts(users);
+    };
+
+    fetchProducts();
+  }, []);
 
   const handleOnSubmit = async (event) => {
     event.preventDefault();
@@ -12,7 +25,7 @@ const Hero = () => {
     const userData = {
       name: event.target.name.value,
       category: event.target.category.value,
-      price: event.target.category.value,
+      price: parseFloat(event.target.price.value),
     };
 
     const options = {
@@ -22,9 +35,15 @@ const Hero = () => {
       },
       body: JSON.stringify(userData),
     };
+
     const response = await fetch(BACKEND_ENDPOINT, options);
     const result = await response.json();
+    console.log(result.user);
+    if (result.success) {
+      setProducts((prev) => [...prev, result.user]);
+    }
   };
+
   return (
     <div className="flex flex-col gap-6 items-center mt-7">
       <div className="flex w-full justify-center">
@@ -35,65 +54,30 @@ const Hero = () => {
           Бараа нэмэх
         </button>
       </div>
-      {/* {modal && (
-        <div className="absolute w-60 bg-slate-400 pad top-full ">
-          <div className="w-full flex justify-start">
-            <button onClick={toggleAddModal}>
-              <svg
-                width="32"
-                height="32"
-                viewBox="0 0 32 32"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M22 10L10 22M10 10L22 22"
-                  stroke="#161616"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
-            </button>
-          </div>
-          <form onSubmit={handleOnSubmit} className="flex flex-col p-6 gap-4">
-            <input
-              placeholder="Name of product"
-              className="input input-bordered w-full max-w-xs"
-              name="name"
-              type="text"
-            />
-            <select onSubmit={handleOnSubmit} name="category" id="">
-              <option value="t-shirt">t-shirt</option>
-              <option value="pants">pants</option>
-              <option value="hoodie">hoodie</option>
-              <option value="sneakers">sneakers</option>
-            </select>
-            <input
-              placeholder="Price"
-              className="input input-bordered w-full max-w-xs"
-              name="price"
-              type="number"
-            />
-            <button type="submit">Submit</button>
-          </form>
-        </div>
-      )} */}
       <dialog id="my_modal_3" className="modal">
         <div className="modal-box">
-          <form onSubmit={handleOnSubmit} method="dialog">
-            {/* if there is a button in form, it will close the modal */}
-            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
-              ✕
-            </button>
+          <form onSubmit={handleOnSubmit} method="dialog" noValidate>
+            <div>
+              <button
+                type="button"
+                className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+                onClick={() => document.getElementById("my_modal_3").close()}
+              >
+                ✕
+              </button>
+              <div className="text-[#161616] font-bold text-2xl ">
+                Бараа үүсгэх
+              </div>
+            </div>
 
             <input
               placeholder="Name of product"
               className="input input-bordered w-full max-w-xs"
               name="name"
               type="text"
+              required
             />
-            <select name="category" id="">
+            <select name="category" required>
               <option value="t-shirt">t-shirt</option>
               <option value="pants">pants</option>
               <option value="hoodie">hoodie</option>
@@ -104,16 +88,26 @@ const Hero = () => {
               className="input input-bordered w-full max-w-xs"
               name="price"
               type="number"
+              required
             />
-            <button type="submit">Submit</button>
+            <button
+              type="submit"
+              onClick={() => document.getElementById("my_modal_3").close()}
+              className="btn bg-green-400"
+            >
+              Submit
+            </button>
           </form>
         </div>
       </dialog>
 
       <div className="flex w-[1640px] justify-center flex-wrap gap-7">
-        <ProductCard />
+        {products?.map((product) => (
+          <ProductCard key={product.id} product={product} />
+        ))}
       </div>
     </div>
   );
 };
+
 export default Hero;
