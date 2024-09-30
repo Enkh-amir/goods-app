@@ -18,9 +18,18 @@ app.use(
 app.use(express.json());
 app.use(bodyParser.json());
 
+app.get("/", (req, res) => {
+  fs.readFile("./data/user.json", "utf-8", (readError, data) => {
+    res.send(data);
+    // res.send(JSON.stringify(data));
+  });
+});
+
 // PUT endpoint to update a user
 app.put("/:id", (req, res) => {
   const userId = req.params.id;
+  console.log("userID", userId);
+
   const { name, category, price } = req.body;
 
   fs.readFile("./data/user.json", "utf-8", (readError, data) => {
@@ -32,7 +41,9 @@ app.put("/:id", (req, res) => {
     const userIndex = savedData.findIndex((user) => user.id === userId);
 
     if (userIndex === -1) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
     const updatedUser = {
@@ -44,12 +55,16 @@ app.put("/:id", (req, res) => {
 
     savedData[userIndex] = updatedUser;
 
-    fs.writeFile("./data/user.json", JSON.stringify(savedData), (writeError) => {
-      if (writeError) {
-        return res.json({ success: false, error: writeError });
+    fs.writeFile(
+      "./data/user.json",
+      JSON.stringify(savedData),
+      (writeError) => {
+        if (writeError) {
+          return res.json({ success: false, error: writeError });
+        }
+        res.json({ success: true, user: updatedUser });
       }
-      res.json({ success: true, user: updatedUser });
-    });
+    );
   });
 });
 
@@ -66,17 +81,23 @@ app.delete("/:id", (req, res) => {
     const userIndex = savedData.findIndex((user) => user.id === userId);
 
     if (userIndex === -1) {
-      return res.status(404).json({ success: false, message: "User not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
     }
 
     savedData.splice(userIndex, 1); // Remove the user from the array
 
-    fs.writeFile("./data/user.json", JSON.stringify(savedData), (writeError) => {
-      if (writeError) {
-        return res.json({ success: false, error: writeError });
+    fs.writeFile(
+      "./data/user.json",
+      JSON.stringify(savedData),
+      (writeError) => {
+        if (writeError) {
+          return res.json({ success: false, error: writeError });
+        }
+        res.json({ success: true, message: "User deleted successfully" });
       }
-      res.json({ success: true, message: "User deleted successfully" });
-    });
+    );
   });
 });
 
@@ -99,12 +120,16 @@ app.post("/", (request, response) => {
     };
     savedData.push(newUser);
 
-    fs.writeFile("./data/user.json", JSON.stringify(savedData), (writeError) => {
-      if (writeError) {
-        return response.json({ success: false, error: writeError });
+    fs.writeFile(
+      "./data/user.json",
+      JSON.stringify(savedData),
+      (writeError) => {
+        if (writeError) {
+          return response.json({ success: false, error: writeError });
+        }
+        response.json({ success: true, user: newUser });
       }
-      response.json({ success: true, user: newUser });
-    });
+    );
   });
 });
 

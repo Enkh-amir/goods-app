@@ -1,1 +1,14 @@
-[{"id":"1727663826940","name":"123","category":"t-shirt","price":123},{"id":"1727663839641","name":"123","category":"t-shirt","price":123}]
+[
+  {
+    "id": "1727667640835",
+    "name": "Saruul",
+    "category": "t-shirt",
+    "price": 123
+  },
+  {
+    "id": "1727667707970",
+    "name": "Saruul",
+    "category": "t-shirt",
+    "price": 12333
+  }
+]
