@@ -1,6 +1,6 @@
 import LogoDelete from "../logoDeleteEdit/LogoDelete";
 import LogoEdit from "../logoDeleteEdit/LogoEdit";
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, handleDelete, handleOnEdit }) => {
   return (
     <div className="flex">
       <div className="bg-slate-50 flex border rounded-2xl shadow-lg">
@@ -10,8 +10,12 @@ const ProductCard = ({ product }) => {
           <p className="text-gray-800 font-semibold">${product.price}</p>
         </div>
         <div className="flex p-6 gap-5 items-center">
-          <LogoDelete />
-          <LogoEdit />
+          <button onClick={handleDelete}>
+            <LogoDelete />
+          </button>
+          <button onClick={handleOnEdit}>
+            <LogoEdit />
+          </button>
         </div>
       </div>
     </div>

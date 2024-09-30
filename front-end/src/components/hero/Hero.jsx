@@ -9,11 +9,17 @@ const Hero = () => {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const response = await fetch(BACKEND_ENDPOINT);
-      const data = await response.json();
-
-      const users = data.map((item) => item.user);
-      setProducts(users);
+      try {
+        const response = await fetch(BACKEND_ENDPOINT);
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        const data = await response.json();
+        const products = data.map((item) => item.product);
+        setProducts(products);
+      } catch (error) {
+        console.error("Failed to fetch products:", error);
+      }
     };
 
     fetchProducts();
@@ -41,6 +47,73 @@ const Hero = () => {
     console.log(result.user);
     if (result.success) {
       setProducts((prev) => [...prev, result.user]);
+    }
+  };
+
+  const handleDelete = async (event, productId) => {
+    event.preventDefault();
+
+    const options = {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    try {
+      const response = await fetch(`${BACKEND_ENDPOINT}/${productId}`, options);
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to delete user");
+      }
+
+      console.log(result.message);
+      if (result.success) {
+        setProducts((prev) =>
+          prev.filter((product) => product.id !== productId)
+        );
+      }
+    } catch (error) {
+      console.error("Error deleting product:", error);
+    }
+  };
+
+  const handleOnEdit = async (event, productId) => {
+    event.preventDefault();
+
+    const userData = {
+      name: event.target.name.value,
+      category: event.target.category.value,
+      price: parseFloat(event.target.price.value),
+    };
+
+    const options = {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userData),
+    };
+
+    try {
+      const response = await fetch(`${BACKEND_ENDPOINT}/${productId}`, options);
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || "Failed to update user");
+      }
+
+      console.log(result.user);
+      if (result.success) {
+        setProducts((prev) =>
+          prev.map((product) =>
+            product.id === productId ? result.user : product
+          )
+        );
+      }
+    } catch (error) {
+      console.error("Error updating user:", error);
     }
   };
 
@@ -103,7 +176,12 @@ const Hero = () => {
 
       <div className="flex w-[1640px] justify-center flex-wrap gap-7">
         {products?.map((product) => (
-          <ProductCard key={product.id} product={product} />
+          <ProductCard
+            key={product.id}
+            product={product}
+            handleOnEdit={handleOnEdit}
+            handleDelete={handleDelete}
+          />
         ))}
       </div>
     </div>
