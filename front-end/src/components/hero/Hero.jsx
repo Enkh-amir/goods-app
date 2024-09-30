@@ -130,46 +130,72 @@ const Hero = () => {
       <dialog id="my_modal_3" className="modal">
         <div className="modal-box">
           <form onSubmit={handleOnSubmit} method="dialog" noValidate>
-            <div>
+            <div className="flex justify-start gap-[130px]">
               <button
                 type="button"
-                className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+                className="btn btn-sm btn-circle btn-ghost"
                 onClick={() => document.getElementById("my_modal_3").close()}
               >
                 ✕
               </button>
-              <div className="text-[#161616] font-bold text-2xl ">
+              <div className="text-[#161616] mb-4 font-bold text-2xl">
                 Бараа үүсгэх
               </div>
             </div>
+            <hr />
+            <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-2">
+                <p>Барааны нэр</p>
+                <input
+                  placeholder="Name of product"
+                  className="input w-full bg-[#F4F4F4]"
+                  name="name"
+                  type="text"
+                  required
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <p>Барааны ангилал</p>
+                <select
+                  className="input select w-full bg-[#F4F4F4]"
+                  name="category"
+                  required
+                >
+                  <option value="t-shirt">T-shirt</option>
+                  <option value="pants">Pants</option>
+                  <option value="hoodie">Hoodie</option>
+                  <option value="sneakers">Sneakers</option>
+                </select>
+              </div>
 
-            <input
-              placeholder="Name of product"
-              className="input input-bordered w-full max-w-xs"
-              name="name"
-              type="text"
-              required
-            />
-            <select name="category" required>
-              <option value="t-shirt">t-shirt</option>
-              <option value="pants">pants</option>
-              <option value="hoodie">hoodie</option>
-              <option value="sneakers">sneakers</option>
-            </select>
-            <input
-              placeholder="Price"
-              className="input input-bordered w-full max-w-xs"
-              name="price"
-              type="number"
-              required
-            />
-            <button
-              type="submit"
-              onClick={() => document.getElementById("my_modal_3").close()}
-              className="btn bg-green-400"
-            >
-              Submit
-            </button>
+              <div className="flex flex-col gap-2 pb-4">
+                <p>Үнэ</p>
+                <input
+                  placeholder="Price"
+                  className="input w-full bg-[#F4F4F4]"
+                  name="price"
+                  type="number"
+                  required
+                />
+              </div>
+              <hr />
+              <div className="flex justify-end gap-7">
+                <button
+                  type="button"
+                  onClick={() => document.getElementById("my_modal_3").close()}
+                  className="btn-ghost p-2 border rounded-md"
+                >
+                  Буцах
+                </button>
+                <button
+                  type="submit"
+                  onClick={() => document.getElementById("my_modal_3").close()}
+                  className="btn bg-green-400"
+                >
+                  Үүсгэх
+                </button>
+              </div>
+            </div>
           </form>
         </div>
       </dialog>
