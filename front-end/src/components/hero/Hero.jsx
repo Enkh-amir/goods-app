@@ -6,7 +6,7 @@ import { CreateModal } from "../ui/createModal";
 import { EditModal } from "../ui/editModal";
 
 const Hero = () => {
-  const BACKEND_ENDPOINT = "http://localhost:8000";
+  const BACKEND_ENDPOINT = "https://goods-app.onrender.com";
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
