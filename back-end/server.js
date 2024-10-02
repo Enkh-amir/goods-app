@@ -26,8 +26,8 @@ app.get("/", (req, res) => {
 });
 
 // PUT endpoint to update a user
-app.put("/:id", (req, res) => {
-  const userId = req.params.id;
+app.put("/", (req, res) => {
+  const userId = req.id;
   console.log("userID", userId);
 
   const { name, category, price } = req.body;
