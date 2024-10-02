@@ -1,0 +1,1 @@
+export const BACKEND_ENDPOINT = "https://goods-app.onrender.com"

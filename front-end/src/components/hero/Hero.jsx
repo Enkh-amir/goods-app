@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import ProductCard from "../ui/ProductCard";
 import { CreateModal } from "../ui/createModal";
 import { EditModal } from "../ui/editModal";
+import { BACKEND_ENDPOINT } from "@/constants/constant";
 
 const Hero = () => {
-  const BACKEND_ENDPOINT = "https://goods-app.onrender.com";
   const [products, setProducts] = useState([]);
 
   useEffect(() => {
@@ -17,9 +17,8 @@ const Hero = () => {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
-
         setProducts(data);
-        console.log("prodycttsss", products);
+        console.log("", data);
       } catch (error) {
         console.error("Failed to fetch products:", error);
       }
@@ -135,17 +134,8 @@ const Hero = () => {
 
       <div className="flex w-[1640px] justify-center flex-wrap gap-7">
         {products?.map((product) => (
-          <ProductCard
-            key={product?.id}
-            product={product}
-            handleOnEdit={handleOnEdit}
-            handleDelete={handleDelete}
-            handleModal={() =>
-              document.getElementById("my_modal_2").showModal()
-            }
-          />
+          <ProductCard key={product?.id} product={product} />
         ))}
-        <EditModal handleOnSubmit={handleOnSubmit} />
       </div>
     </div>
   );
