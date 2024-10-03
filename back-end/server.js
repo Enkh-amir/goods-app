@@ -25,52 +25,50 @@ app.get("/", (req, res) => {
   });
 });
 
-// PUT endpoint to update a user
-app.put("/", (req, res) => {
-  const userId = req.id;
-  console.log("userID", userId);
-
-  const { name, category, price } = req.body;
+app.put("/", (request, response) => {
+  const { id, name, category, price } = request.body;
 
   fs.readFile("./data/user.json", "utf-8", (readError, data) => {
     if (readError) {
-      return res.json({ success: false, error: readError });
+      response.json({
+        success: false,
+        error: error,
+      });
     }
 
-    let savedData = data ? JSON.parse(data) : [];
-    const userIndex = savedData.findIndex((user) => user.id === userId);
+    let dbData = data ? JSON.parse(data) : [];
 
-    if (userIndex === -1) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
-    }
-
-    const updatedUser = {
-      id: userId,
-      name: name || savedData[userIndex].name,
-      category: category || savedData[userIndex].category,
-      price: price || savedData[userIndex].price,
-    };
-
-    savedData[userIndex] = updatedUser;
-
-    fs.writeFile(
-      "./data/user.json",
-      JSON.stringify(savedData),
-      (writeError) => {
-        if (writeError) {
-          return res.json({ success: false, error: writeError });
-        }
-        res.json({ success: true, user: updatedUser });
+    const editedData = dbData.map((data) => {
+      if (data?.id === id) {
+        return {
+          id,
+          name,
+          category,
+          price,
+        };
       }
-    );
+      return data;
+    });
+
+    fs.writeFile("./data/user.json", JSON.stringify(editedData), (error) => {
+      if (error) {
+        response.json({
+          success: false,
+          error: error,
+        });
+      } else {
+        response.json({
+          success: true,
+          products: editedData,
+        });
+      }
+    });
   });
 });
 
 // DELETE endpoint to delete a user
-app.delete("/:id", (req, res) => {
-  const userId = req.params.id;
+app.delete("/", (req, res) => {
+  const userId = req.id;
 
   fs.readFile("./data/user.json", "utf-8", (readError, data) => {
     if (readError) {
@@ -101,7 +99,7 @@ app.delete("/:id", (req, res) => {
   });
 });
 
-// POST endpoint to create a user
+
 app.post("/", (request, response) => {
   const { name, category, price } = request.body;
 
