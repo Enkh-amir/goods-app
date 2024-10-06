@@ -45,7 +45,7 @@ export default function Home() {
         <div className="w-[1640px] grid grid-cols-3 gap-6 mt-6">
           {products.map((product) => (
             <Card
-              key={product.id} // Assuming each product has a unique `id`
+              key={product.id} 
               product={product}
               setProducts={setProducts}
               setSelectedProduct={setSelectedProduct}

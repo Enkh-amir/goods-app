@@ -9,7 +9,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-app.get("/product", async (req, res) => {
+app.get("/", async (req, res) => {
   try {
     const data = await fs.readFile("./data/products.json", "utf-8");
     const products = data ? JSON.parse(data) : [];
@@ -116,7 +116,7 @@ app.delete("/", (request, response) => {
   });
 });
 
-app.put("/product", (request, response) => {
+app.put("/", (request, response) => {
   const { id, productName, category, price } = request.body;
 
   fs.readFile("./data/products.json", "utf-8", (readError, data) => {
