@@ -1,52 +1,14 @@
-import { useState } from "react";
-import LogoEdit from "../logoDeleteEdit/LogoEdit";
-import { BACKEND_ENDPOINT } from "@/constants/constant";
-
-export const EditModal = ({ product: productProps, setProducts }) => {
-  const [product, setProduct] = useState(productProps);
-  const [errorMessage, setErrorMessage] = useState("");
-
-  const handleInputChange = (event) => {
-    const { name, value } = event.target;
-    setProduct((prevProduct) => ({
-      ...prevProduct,
-      [name]: name === "price" ? parseFloat(value) : value,
-    }));
+export const EditModal = ({
+  selectedProduct,
+  handleSubmit,
+  handleInputChange,
+  setSelectedProduct,
+  product,
+}) => {
+  const handleModalClick = () => {
+    document.getElementById("my_modal_2").showModal();
+    setSelectedProduct(product);
   };
-
-  const handleOnEdit = async (event) => {
-    event.preventDefault();
-    setErrorMessage(""); // Reset any previous error messages
-
-    const options = {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(product),
-    };
-
-    try {
-      const response = await fetch(BACKEND_ENDPOINT, options);
-      const result = await response.json();
-
-      if (!response.ok) {
-        throw new Error(result.error || "Failed to update product");
-      }
-
-      console.log("result.product", result.product);
-      if (result.success) {
-        setProducts((prev) =>
-          prev.map((prod) => (prod.id === product.id ? result.product : prod))
-        );
-        document.getElementById("my_modal_2").close(); // Close modal on success
-      }
-    } catch (error) {
-      console.error("Error updating product:", error);
-      setErrorMessage(error.message); // Set error message to display
-    }
-  };
-
   return (
     <>
       <button
@@ -79,7 +41,7 @@ export const EditModal = ({ product: productProps, setProducts }) => {
                   placeholder="Name of product"
                   className="input w-full bg-[#F4F4F4]"
                   name="name"
-                  value={product?.name}
+                  value={selectedProduct?.productName}
                   onChange={handleInputChange}
                   type="text"
                   required
@@ -90,7 +52,7 @@ export const EditModal = ({ product: productProps, setProducts }) => {
                 <select
                   className="input select w-full bg-[#F4F4F4]"
                   name="category"
-                  value={product?.category}
+                  value={selectedProduct?.category}
                   onChange={handleInputChange}
                   required
                 >
@@ -109,7 +71,7 @@ export const EditModal = ({ product: productProps, setProducts }) => {
                   name="price"
                   type="number"
                   min="0" // Ensures price cannot be negative
-                  value={product?.price}
+                  value={selectedProduct?.price}
                   onChange={handleInputChange}
                   required
                 />
@@ -123,7 +85,11 @@ export const EditModal = ({ product: productProps, setProducts }) => {
                 >
                   Буцах
                 </button>
-                <button type="submit" className="btn bg-green-400">
+                <button
+                  type="submit"
+                  onClick={handleSubmit}
+                  className="btn bg-green-400"
+                >
                   Үүсгэх
                 </button>
               </div>

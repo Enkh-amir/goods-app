@@ -1,8 +1,58 @@
-export const CreateModal = ({handleOnSubmit}) => {
+import { BACKEND_ENDPOINT } from "@/constants/constant";
+import { useState } from "react";
+
+export const CreateModal = ({ setProducts }) => {
+  const [product, setProduct] = useState({});
+
+  const handleSubmit = async (event) => {
+    try {
+      event.preventDefault();
+      const options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(product),
+      };
+      const response = await fetch(`${BACKEND_ENDPOINT}/product`, options);
+      const data = await response.json();
+      setProducts((prevProducts) => [...prevProducts, data.product]);
+    } catch {
+      console.log("error");
+    }
+
+    setProduct({
+      productName: "",
+      category: "",
+      price: "",
+    });
+    document.getElementById("my_modal_3").close();
+  };
+
+  const handleInputChange = (event) => {
+    const name = event.target.name;
+    const value = event.target.value;
+
+    setProduct((prevProduct) => {
+      return {
+        ...prevProduct,
+        [name]: value,
+      };
+    });
+  };
+
   return (
-    <dialog id="my_modal_3" className="modal">
-      <div className="modal-box">
-        <form onSubmit={handleOnSubmit} method="dialog" noValidate>
+    <>
+      <div className="flex w-full justify-center">
+        <button
+          onClick={() => document.getElementById("my_modal_3").showModal()}
+          className="btn w-max bg-green-400"
+        >
+          Бараа нэмэх
+        </button>
+      </div>
+      <dialog id="my_modal_3" className="modal">
+        <div className="modal-box">
           <div className="flex justify-start gap-[130px]">
             <button
               type="button"
@@ -25,6 +75,8 @@ export const CreateModal = ({handleOnSubmit}) => {
                 name="name"
                 type="text"
                 required
+                value={product?.productName}
+                onChange={handleInputChange}
               />
             </div>
             <div className="flex flex-col gap-2">
@@ -33,6 +85,8 @@ export const CreateModal = ({handleOnSubmit}) => {
                 className="input select w-full bg-[#F4F4F4]"
                 name="category"
                 required
+                onChange={handleInputChange}
+                value={product?.category}
               >
                 <option value="t-shirt">T-shirt</option>
                 <option value="pants">Pants</option>
@@ -49,6 +103,8 @@ export const CreateModal = ({handleOnSubmit}) => {
                 name="price"
                 type="number"
                 required
+                onChange={handleInputChange}
+                value={product?.price}
               />
             </div>
             <hr />
@@ -62,15 +118,15 @@ export const CreateModal = ({handleOnSubmit}) => {
               </button>
               <button
                 type="submit"
-                onClick={() => document.getElementById("my_modal_3").close()}
+                onClick={handleSubmit}
                 className="btn bg-green-400"
               >
                 Үүсгэх
               </button>
             </div>
           </div>
-        </form>
-      </div>
-    </dialog>
+        </div>
+      </dialog>
+    </>
   );
 };

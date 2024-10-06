@@ -1,138 +1,166 @@
-import cors from "cors";
 import express from "express";
 import bodyParser from "body-parser";
-import fs from "fs";
+import cors from "cors";
+import fs from "fs/promises"; // Use promises for async/await
 
+const port = 8000;
 const app = express();
-const PORT = 8000;
 
-app.use(
-  cors({
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
-);
-
-app.use(express.json());
 app.use(bodyParser.json());
+app.use(cors());
 
-app.get("/", (req, res) => {
-  fs.readFile("./data/user.json", "utf-8", (readError, data) => {
-    res.send(data);
-    // res.send(JSON.stringify(data));
-  });
+app.get("/product", async (req, res) => {
+  try {
+    const data = await fs.readFile("./data/products.json", "utf-8");
+    const products = data ? JSON.parse(data) : [];
+
+    if (!products.length) {
+      return res.status(404).json({
+        success: false,
+        message: "No products found",
+        products: [],
+      });
+    }
+
+    res.json({
+      success: true,
+      products,
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: "Failed to read product data",
+    });
+  }
 });
 
-// PUT endpoint to update a user
-app.put("/", (req, res) => {
-  const userId = req.id;
-  console.log("userID", userId);
-
-  const { name, category, price } = req.body;
-
-  fs.readFile("./data/user.json", "utf-8", (readError, data) => {
-    if (readError) {
-      return res.json({ success: false, error: readError });
-    }
-
-    let savedData = data ? JSON.parse(data) : [];
-    const userIndex = savedData.findIndex((user) => user.id === userId);
-
-    if (userIndex === -1) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
-    }
-
-    const updatedUser = {
-      id: userId,
-      name: name || savedData[userIndex].name,
-      category: category || savedData[userIndex].category,
-      price: price || savedData[userIndex].price,
-    };
-
-    savedData[userIndex] = updatedUser;
-
-    fs.writeFile(
-      "./data/user.json",
-      JSON.stringify(savedData),
-      (writeError) => {
-        if (writeError) {
-          return res.json({ success: false, error: writeError });
-        }
-        res.json({ success: true, user: updatedUser });
-      }
-    );
-  });
-});
-
-// DELETE endpoint to delete a user
-app.delete("/:id", (req, res) => {
-  const userId = req.params.id;
-
-  fs.readFile("./data/user.json", "utf-8", (readError, data) => {
-    if (readError) {
-      return res.json({ success: false, error: readError });
-    }
-
-    let savedData = data ? JSON.parse(data) : [];
-    const userIndex = savedData.findIndex((user) => user.id === userId);
-
-    if (userIndex === -1) {
-      return res
-        .status(404)
-        .json({ success: false, message: "User not found" });
-    }
-
-    savedData.splice(userIndex, 1); // Remove the user from the array
-
-    fs.writeFile(
-      "./data/user.json",
-      JSON.stringify(savedData),
-      (writeError) => {
-        if (writeError) {
-          return res.json({ success: false, error: writeError });
-        }
-        res.json({ success: true, message: "User deleted successfully" });
-      }
-    );
-  });
-});
-
-// POST endpoint to create a user
 app.post("/", (request, response) => {
-  const { name, category, price } = request.body;
+  const { productName, category, price } = request.body;
 
-  fs.readFile("./data/user.json", "utf-8", (readError, data) => {
-    let savedData = data ? JSON.parse(data) : [];
-
+  fs.readFile("./data/products.json", "utf-8", (readError, data) => {
     if (readError) {
-      return response.json({ success: false, error: readError });
+      response.json({
+        success: false,
+        error: error,
+      });
     }
 
-    const newUser = {
+    let dbData = data ? JSON.parse(data) : [];
+
+    const newProduct = {
       id: Date.now().toString(),
-      name,
-      category,
-      price,
+      productName: productName,
+      category: category,
+      price: price,
     };
-    savedData.push(newUser);
+
+    dbData.push(newProduct);
+
+    fs.writeFile("./data/products.json", JSON.stringify(dbData), (error) => {
+      if (error) {
+        response.json({
+          success: false,
+          error: error,
+        });
+      } else {
+        response.json({
+          success: true,
+          product: newProduct,
+        });
+      }
+    });
+  });
+});
+
+app.delete("/", (request, response) => {
+  const { id } = request.body;
+
+  fs.readFile("./data/products.json", "utf-8", (readError, data) => {
+    if (readError) {
+      response.json({
+        success: false,
+        error: error,
+      });
+    }
+
+    let dbData = data ? JSON.parse(data) : [];
+
+    const filteredData = dbData.filter((data) => data?.id !== id);
+
+    const deletedProduct = dbData.find((data) => data?.id === id);
+
+    if (filteredData.length === dbData.length) {
+      response.json({
+        success: false,
+        error: "Product id not found",
+      });
+    }
 
     fs.writeFile(
-      "./data/user.json",
-      JSON.stringify(savedData),
-      (writeError) => {
-        if (writeError) {
-          return response.json({ success: false, error: writeError });
+      "./data/products.json",
+      JSON.stringify(filteredData),
+      (error) => {
+        if (error) {
+          response.json({
+            success: false,
+            error: error,
+          });
+        } else {
+          response.json({
+            success: true,
+            product: deletedProduct,
+          });
         }
-        response.json({ success: true, user: newUser });
       }
     );
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
+app.put("/product", (request, response) => {
+  const { id, productName, category, price } = request.body;
+
+  fs.readFile("./data/products.json", "utf-8", (readError, data) => {
+    if (readError) {
+      response.json({
+        success: false,
+        error: error,
+      });
+    }
+
+    let dbData = data ? JSON.parse(data) : [];
+
+    const editedData = dbData.map((data) => {
+      if (data?.id === id) {
+        return {
+          id,
+          productName,
+          category,
+          price,
+        };
+      }
+      return data;
+    });
+
+    fs.writeFile(
+      "./data/products.json",
+      JSON.stringify(editedData),
+      (error) => {
+        if (error) {
+          response.json({
+            success: false,
+            error: error,
+          });
+        } else {
+          response.json({
+            success: true,
+            products: editedData,
+          });
+        }
+      }
+    );
+  });
+});
+
+app.listen(port, () => {
+  console.log(`Server ajillaj bn http://localhost:${port}`);
 });
